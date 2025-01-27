@@ -1,0 +1,16 @@
+package com.nodiumhosting.backrooms.event;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+
+public class PlayerSpawn {
+    public static void handle(PlayerSpawnEvent event) {
+        Player player = event.getPlayer();
+        player.sendPlayerListHeader(Component.text("Backrooms").style(Style.style(TextDecoration.OBFUSCATED)));
+        player.setSkin(new PlayerSkin("ewogICJ0aW1lc3RhbXAiIDogMTczNzk3ODEzNzI3NCwKICAicHJvZmlsZUlkIiA6ICI5NTFmOWQ5Mjg3Mzc0ZDk5OTg0ZjcyMzAxNjBkOGJiMCIsCiAgInByb2ZpbGVOYW1lIiA6ICJNY01lbG9uVFYiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWUxNmM3NWE1ODBiZmY2NjRkN2U5ZDBlNzZhZjQ2NTI1MmE5ODQzMjU2NTRiYzk4ZmEyMTY4ZWRiNTBkNWIwZCIKICAgIH0KICB9Cn0=","U/aVrtLk6bpfX4q7QWOncByhB+kcUTfzsNE86pRFrjoMQ6dxY+NynQUdo1mSaK8/coCHDOKaPKvUceQ7oapKaPuToVdSCTpgnr7WDRhjSyCOAglVzpmgsi/LLhyx+T3q3OUb3s9CSTqLtyHo8mmSa/5CR7+Mb2uxTE2MuMo4hSxRfAbY37BCWGPuSZKgfX3fw9dnAevfPPyzSj6kOXHxG0+CVKKZK1xWdoAoQWyKM6HvC2/AWNEEmynyfq2Bs6jEDTIHBztWfSXbauuThz3g1aoYeGN1m9IeMxkfX9UsuJ2AvIDVEnlXbx3LDeusFCOwQqIr8piw0Lr1kjdaQ7K4SB1JiACdf8akCqmKgnzJysllxuJbkNIm11TXV7Wxkiar7fmS0UpmEtNWtUyYhPABaRwNNYYX+3cYUyeSwcnFe9rGZ0nHIxvaKtNGWqJfuZ1/LeRjjjo82BlgxS6JwcLpqqnp7Zbh0c1PBrbUmH+7ppuVkW1QjInTXnBfBHGL3qssqOkflS26T9qv06D2L26pL5F6Il93Vzg11ounfwv4EBlW66z8RVV60FuZ0ayiwTHmUA2TZKJvRosUdBsRZgV4FZLsJmM0W96xv31GN09GmCJ9ZaOmUKJreESwFc+Dv71aeCD7AWahs4tiPgDjHmp7qy9B8SCSvVM53N6VF70tP1s="));
+    }
+}

@@ -1,13 +1,13 @@
 package com.nodiumhosting.backrooms;
 
-import com.nodiumhosting.backrooms.generator.BackroomsGenerator;
+import com.nodiumhosting.backrooms.event.PlayerConfiguration;
+import com.nodiumhosting.backrooms.event.PlayerPreLogin;
+import com.nodiumhosting.backrooms.event.PlayerSpawn;
+import com.nodiumhosting.backrooms.event.ServerListPing;
+import com.nodiumhosting.backrooms.level.Levels;
+import com.nodiumhosting.backrooms.level.generator.FlatGenerator;
 import com.nodiumhosting.backrooms.resourcepack.ServerResourcePack;
 import lombok.Getter;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.resource.ResourcePackRequest;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
@@ -15,7 +15,6 @@ import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
-import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.event.player.AsyncPlayerPreLoginEvent;
@@ -25,21 +24,13 @@ import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
-import net.minestom.server.instance.block.Block;
-import net.minestom.server.network.player.GameProfile;
-import net.minestom.server.ping.ResponseData;
-import net.minestom.server.registry.DynamicRegistry;
-import net.minestom.server.utils.NamespaceID;
-import net.minestom.server.world.biome.Biome;
-import net.minestom.server.world.biome.BiomeEffects;
+import net.minestom.server.world.DimensionType;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 public class Backrooms {
     public static final Logger LOGGER = LoggerFactory.getLogger(Backrooms.class);
-    public static DynamicRegistry.Key<Biome> biomeTypeKey;
     @Getter
     private static InstanceContainer instanceContainer;
     @Getter
@@ -57,63 +48,33 @@ public class Backrooms {
         MinecraftServer.setBrandName("backrooms");
 
         instanceManager = MinecraftServer.getInstanceManager();
-        biomeTypeKey = MinecraftServer.getBiomeRegistry().register("backrooms", Biome.builder().effects(BiomeEffects.builder().ambientSound(new BiomeEffects.AmbientSound(NamespaceID.from(Key.key("backrooms:event.ambience")))).build()).build());
-        instanceContainer = instanceManager.createInstanceContainer(DimensionTypes.BACKROOMS.getDimensionType());
 
-        MinecraftServer.getCommandManager().register(new GameModeCommand());
-
-        instanceContainer.setGenerator(new BackroomsGenerator());
+        instanceContainer = instanceManager.createInstanceContainer(DimensionType.OVERWORLD);
+        instanceContainer.setGenerator(new FlatGenerator());
         instanceContainer.setChunkSupplier(LightingChunk::new);
 
-        // clear out a spawn area around 0 0 0
-        int radius = 3;
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
-                for (int y = 0; y < 6; y++) {
-                    instanceContainer.setBlock(x, y, z, Block.AIR);
-                }
-            }
-        }
+        Levels.init();
 
-        GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-
-        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
-            final Player player = event.getPlayer();
-            event.setSpawningInstance(Backrooms.getInstanceContainer());
-            player.setRespawnPoint(new Pos(0, 0, 0));
-            player.setGameMode(net.minestom.server.entity.GameMode.ADVENTURE);
-
-            player.sendResourcePacks(
-                    ResourcePackRequest.resourcePackRequest()
-                            .required(true)
-                            .packs(ServerResourcePack.resourcePackInfo)
-            );
-
-            //DEBUG
-            if (player.getUuid().equals(UUID.fromString("951f9d92-8737-4d99-984f-7230160d8bb0"))) {
-                player.setPermissionLevel(4);
-            }
-        });
-
-        globalEventHandler.addListener(ServerListPingEvent.class, event -> {
-            ResponseData responseData = new ResponseData();
-            responseData.setDescription(Component.text("Backrooms Server"));
-            responseData.setPlayersHidden(true);
-            event.setResponseData(responseData);
-        });
-
-        globalEventHandler.addListener(AsyncPlayerPreLoginEvent.class, event -> {
-            event.setGameProfile(new GameProfile(event.getGameProfile().uuid(), "Explorer"));
-        });
-
-        globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
-            Player player = event.getPlayer();
-            player.sendPlayerListHeader(Component.text("Backrooms").style(Style.style(TextDecoration.OBFUSCATED)));
-            player.setSkin(PlayerSkin.fromUuid("caa6a7c8-10a6-4ded-9bfd-ab49497bf9bc"));
-        });
+        registerEvents();
+        registerCommands();
 
         MojangAuth.init();
         minecraftServer.start("0.0.0.0", 25565);
+    }
+
+    private static void registerEvents() {
+        GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
+        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, PlayerConfiguration::handle);
+        globalEventHandler.addListener(ServerListPingEvent.class, ServerListPing::handle);
+        globalEventHandler.addListener(AsyncPlayerPreLoginEvent.class, PlayerPreLogin::handle);
+        globalEventHandler.addListener(PlayerSpawnEvent.class, PlayerSpawn::handle);
+    }
+
+    private static void registerCommands() {
+        MinecraftServer.getCommandManager().register(
+                new GameModeCommand(),
+                new LevelCommand()
+        );
     }
 
     static class GameModeCommand extends Command {
@@ -145,6 +106,55 @@ public class Backrooms {
                 final Player player = (Player) sender;
                 player.setGameMode(gameMode);
             }, gamemode);
+        }
+    }
+
+    static class LevelCommand extends Command {
+        public LevelCommand() {
+            super("level", "lvl");
+
+            var levelArg = ArgumentType.Enum("level", Levels.class);
+            var intArg = ArgumentType.Integer("level");
+            var rootArg = ArgumentType.Literal("root");
+
+            setDefaultExecutor((sender, context) -> {
+                sender.sendMessage("Usage: /level <level>");
+            });
+
+            setCondition((sender, commandString) -> {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("You must be a player to use this command!");
+                    return false;
+                }
+                return player.getPermissionLevel() >= 4;
+            });
+
+            addSyntax((sender, context) -> {
+                final Levels level = context.get(levelArg);
+                final Player player = (Player) sender;
+                InstanceContainer instanceContainer = level.getLevel().instanceContainer;
+                if (player.getInstance().equals(instanceContainer)) return;
+                player.setInstance(instanceContainer, Pos.ZERO);
+            }, levelArg);
+
+            addSyntax((sender, context) -> {
+                final int lvl = context.get(intArg);
+                final Player player = (Player) sender;
+                Levels[] levels = Levels.values();
+                int len = levels.length;
+                if (lvl >= len) return;
+                @Nullable Levels level = Levels.values()[lvl];
+                if (level == null) return;
+                InstanceContainer instanceContainer = level.getLevel().instanceContainer;
+                if (player.getInstance().equals(instanceContainer)) return;
+                player.setInstance(instanceContainer, Pos.ZERO);
+            }, intArg);
+
+            addSyntax((sender, context) -> {
+                Player player = (Player) sender;
+                if (player.getInstance().equals(instanceContainer)) return;
+                player.setInstance(instanceContainer, Pos.ZERO);
+            }, rootArg);
         }
     }
 }

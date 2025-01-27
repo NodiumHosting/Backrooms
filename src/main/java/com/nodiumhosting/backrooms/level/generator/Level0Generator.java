@@ -1,22 +1,26 @@
-package com.nodiumhosting.backrooms.generator;
+package com.nodiumhosting.backrooms.level.generator;
 
-import com.nodiumhosting.backrooms.Backrooms;
+import net.kyori.adventure.key.Key;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.generator.GenerationUnit;
 import net.minestom.server.instance.generator.Generator;
+import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.utils.NamespaceID;
+import net.minestom.server.world.biome.Biome;
+import net.minestom.server.world.biome.BiomeEffects;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class BackroomsGenerator implements Generator {
+public class Level0Generator implements Generator {
     private static final int ROOM_MIN_SIZE = 8;
     private static final int ROOM_MAX_SIZE = 16;
     private static final int UNIT_HEIGHT = 6;
-    private static final int CORRIDOR_WIDTH = 3;
-
+    private static final DynamicRegistry.Key<Biome> biomeTypeKey = MinecraftServer.getBiomeRegistry().register("level0", Biome.builder().effects(BiomeEffects.builder().ambientSound(new BiomeEffects.AmbientSound(NamespaceID.from(Key.key("backrooms:event.ambience")))).build()).build());
     private final Random random = new Random();
 
     @Override
@@ -24,7 +28,7 @@ public class BackroomsGenerator implements Generator {
         Point start = unit.absoluteStart();
         Point end = start.add(unit.size());
 
-        unit.modifier().fillBiome(Backrooms.biomeTypeKey);
+        unit.modifier().fillBiome(biomeTypeKey);
 
         // Fill with stone
         unit.modifier().fill(Block.BEDROCK);

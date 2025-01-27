@@ -1,16 +1,16 @@
-package com.nodiumhosting.backrooms;
+package com.nodiumhosting.backrooms.level;
 
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
 
-public enum DimensionTypes {
-    BACKROOMS(MinecraftServer.getDimensionTypeRegistry().register("backrooms:backrooms", DimensionType.builder().ambientLight(0.05f).build()));
+public enum LevelDimensionTypes {
+    LEVEL0(MinecraftServer.getDimensionTypeRegistry().register("backrooms:level0", DimensionType.builder().ambientLight(0.05f).build()));
 
     private final DynamicRegistry.@NotNull Key<DimensionType> dimensionType;
 
-    DimensionTypes(DynamicRegistry.@NotNull Key<DimensionType> dimensionType) {
+    LevelDimensionTypes(DynamicRegistry.@NotNull Key<DimensionType> dimensionType) {
         this.dimensionType = dimensionType;
     }
 
