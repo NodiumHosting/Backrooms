@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version "8.3.0"
+    id 'io.freefair.lombok' version "8.11"
+}
+
+group 'com.nodiumhosting.backrooms'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-simple:2.0.13'
+    implementation 'net.minestom:minestom-snapshots:b80c799750'
+
+    implementation 'team.unnamed:creative-api:1.7.3'
+    implementation 'team.unnamed:creative-serializer-minecraft:1.7.3'
+    implementation 'team.unnamed:creative-server:1.7.3'
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21)) // Minestom has a minimum Java version of 21
+    }
+}
+
+tasks {
+    jar {
+        manifest {
+            attributes["Main-Class"] = "com.nodiumhosting.backrooms.Backrooms"
+        }
+    }
+
+    build {
+        dependsOn(shadowJar)
+    }
+    shadowJar {
+        mergeServiceFiles()
+        archiveClassifier.set("") // Prevent the -all suffix on the shadowjar file.
+    }
+}
