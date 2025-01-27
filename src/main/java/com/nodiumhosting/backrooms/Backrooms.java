@@ -1,22 +1,24 @@
 package com.nodiumhosting.backrooms;
 
-import com.nodiumhosting.backrooms.event.player.PlayerConfigurationEvent;
 import com.nodiumhosting.backrooms.generator.BackroomsGenerator;
 import com.nodiumhosting.backrooms.resourcepack.ServerResourcePack;
 import lombok.Getter;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.entity.PlayerSkin;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.AsyncPlayerPreLoginEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.extras.MojangAuth;
@@ -24,7 +26,7 @@ import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.network.packet.server.play.PlayerInfoRemovePacket;
+import net.minestom.server.network.player.GameProfile;
 import net.minestom.server.ping.ResponseData;
 import net.minestom.server.registry.DynamicRegistry;
 import net.minestom.server.utils.NamespaceID;
@@ -32,6 +34,8 @@ import net.minestom.server.world.biome.Biome;
 import net.minestom.server.world.biome.BiomeEffects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 public class Backrooms {
     public static final Logger LOGGER = LoggerFactory.getLogger(Backrooms.class);
@@ -72,24 +76,40 @@ public class Backrooms {
         }
 
         GlobalEventHandler globalEventHandler = MinecraftServer.getGlobalEventHandler();
-        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, PlayerConfigurationEvent::onPlayerConfiguration);
+
+        globalEventHandler.addListener(AsyncPlayerConfigurationEvent.class, event -> {
+            final Player player = event.getPlayer();
+            event.setSpawningInstance(Backrooms.getInstanceContainer());
+            player.setRespawnPoint(new Pos(0, 0, 0));
+            player.setGameMode(net.minestom.server.entity.GameMode.ADVENTURE);
+
+            player.sendResourcePacks(
+                    ResourcePackRequest.resourcePackRequest()
+                            .required(true)
+                            .packs(ServerResourcePack.resourcePackInfo)
+            );
+
+            //DEBUG
+            if (player.getUuid().equals(UUID.fromString("951f9d92-8737-4d99-984f-7230160d8bb0"))) {
+                player.setPermissionLevel(4);
+            }
+        });
+
         globalEventHandler.addListener(ServerListPingEvent.class, event -> {
             ResponseData responseData = new ResponseData();
             responseData.setDescription(Component.text("Backrooms Server"));
             responseData.setPlayersHidden(true);
             event.setResponseData(responseData);
         });
+
+        globalEventHandler.addListener(AsyncPlayerPreLoginEvent.class, event -> {
+            event.setGameProfile(new GameProfile(event.getGameProfile().uuid(), "Explorer"));
+        });
+
         globalEventHandler.addListener(PlayerSpawnEvent.class, event -> {
-            Audiences.players().forEachAudience(a -> {
-                if (!(a instanceof Player player)) {
-                    return;
-                }
-
-                player.sendPlayerListHeader(Component.text("Backrooms").style(Style.style(TextDecoration.OBFUSCATED)));
-
-                PlayerInfoRemovePacket playerInfoRemovePacket = new PlayerInfoRemovePacket(player.getUuid());
-                player.sendPacket(playerInfoRemovePacket);
-            });
+            Player player = event.getPlayer();
+            player.sendPlayerListHeader(Component.text("Backrooms").style(Style.style(TextDecoration.OBFUSCATED)));
+            player.setSkin(PlayerSkin.fromUuid("caa6a7c8-10a6-4ded-9bfd-ab49497bf9bc"));
         });
 
         MojangAuth.init();
