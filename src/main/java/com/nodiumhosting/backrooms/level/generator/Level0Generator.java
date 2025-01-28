@@ -30,7 +30,6 @@ public class Level0Generator implements Generator {
 
         unit.modifier().fillBiome(biomeTypeKey);
 
-        // Fill with stone
         unit.modifier().fill(Block.BEDROCK);
 
         unit.modifier().fillHeight(-1, 0, Block.YELLOW_CONCRETE);

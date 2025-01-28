@@ -142,17 +142,17 @@ public class ServerResourcePack {
         resourcePack.texture(lamp);
         resourcePack.sound(sound);
         resourcePack.soundEvent(soundEvent);
-        resourcePack.texture(hotbar);
-        resourcePack.texture(hotbarSelection);
-        resourcePack.texture(expBarEmpty);
-        resourcePack.texture(expBarFull);
-        resourcePack.texture(food);
-        resourcePack.texture(foodEmpty);
-        resourcePack.texture(heart);
-        resourcePack.texture(heartEmpty);
-        resourcePack.texture(inventory);
-        resourcePack.texture(recipeBookButton);
-        resourcePack.texture(recipeBookButtonHighlighted);
+//        resourcePack.texture(hotbar);
+//        resourcePack.texture(hotbarSelection);
+//        resourcePack.texture(expBarEmpty);
+//        resourcePack.texture(expBarFull);
+//        resourcePack.texture(food);
+//        resourcePack.texture(foodEmpty);
+//        resourcePack.texture(heart);
+//        resourcePack.texture(heartEmpty);
+//        resourcePack.texture(inventory);
+//        resourcePack.texture(recipeBookButton);
+//        resourcePack.texture(recipeBookButtonHighlighted);
 
         BuiltResourcePack builtResourcePack = MinecraftResourcePackWriter.minecraft().build(resourcePack);
 

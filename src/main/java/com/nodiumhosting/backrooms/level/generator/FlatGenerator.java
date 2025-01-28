@@ -5,8 +5,6 @@ import net.minestom.server.instance.generator.GenerationUnit;
 import net.minestom.server.instance.generator.Generator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 public class FlatGenerator implements Generator {
     @Override
     public void generate(@NotNull GenerationUnit unit) {
@@ -14,10 +12,5 @@ public class FlatGenerator implements Generator {
         unit.modifier().fillHeight(0, 1, Block.BEDROCK);
         unit.modifier().fillHeight(1, 4, Block.DIRT);
         unit.modifier().fillHeight(4, 5, Block.GRASS_BLOCK);
-    }
-
-    @Override
-    public void generateAll(@NotNull Collection<@NotNull GenerationUnit> units) {
-        Generator.super.generateAll(units);
     }
 }

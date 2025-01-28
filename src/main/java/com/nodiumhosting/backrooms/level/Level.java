@@ -2,9 +2,9 @@ package com.nodiumhosting.backrooms.level;
 
 import com.nodiumhosting.backrooms.Backrooms;
 import net.minestom.server.instance.InstanceContainer;
-import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.generator.Generator;
 import net.minestom.server.registry.DynamicRegistry;
+import net.minestom.server.utils.chunk.ChunkSupplier;
 import net.minestom.server.world.DimensionType;
 
 public class Level {
@@ -13,14 +13,14 @@ public class Level {
     public final InstanceContainer instanceContainer;
     public final Generator generator;
 
-    public Level(int ID, DynamicRegistry.Key<DimensionType> dimensionTypeKey, Generator generator) {
+    public Level(int ID, DynamicRegistry.Key<DimensionType> dimensionTypeKey, Generator generator, ChunkSupplier chunkSupplier) {
         this.ID = ID;
         this.dimensionTypeKey = dimensionTypeKey;
         this.generator = generator;
 
         InstanceContainer instanceContainer = Backrooms.getInstanceManager().createInstanceContainer(dimensionTypeKey);
         instanceContainer.setGenerator(generator);
-        instanceContainer.setChunkSupplier(LightingChunk::new);
+        instanceContainer.setChunkSupplier(chunkSupplier);
         this.instanceContainer = instanceContainer;
     }
 }

@@ -6,12 +6,13 @@ import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
 
 public enum LevelDimensionTypes {
-    LEVEL0(MinecraftServer.getDimensionTypeRegistry().register("backrooms:level0", DimensionType.builder().ambientLight(0.05f).build()));
+    LEVEL0("backrooms:level0", DimensionType.builder().ambientLight(0.05f).build()),
+    LEVEL1("backrooms:level1", DimensionType.builder().ambientLight(1f).build());
 
     private final DynamicRegistry.@NotNull Key<DimensionType> dimensionType;
 
-    LevelDimensionTypes(DynamicRegistry.@NotNull Key<DimensionType> dimensionType) {
-        this.dimensionType = dimensionType;
+    LevelDimensionTypes(String id, DimensionType dimensionType) {
+        this.dimensionType = MinecraftServer.getDimensionTypeRegistry().register(id, dimensionType);
     }
 
     public DynamicRegistry.@NotNull Key<DimensionType> getDimensionType() {
