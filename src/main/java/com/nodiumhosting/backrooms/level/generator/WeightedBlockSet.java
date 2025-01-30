@@ -39,11 +39,13 @@ public class WeightedBlockSet {
         int index = random.nextInt(0, total);
 
         int runningTotal = 0;
+        WeightedBlock block = null;
         for (WeightedBlock iteratedWeightedBlock : weightedBlockList) {
-            if (index <= runningTotal) return iteratedWeightedBlock;
+            if (index <= runningTotal) break;
             runningTotal += iteratedWeightedBlock.weight;
+            block = iteratedWeightedBlock;
         }
 
-        return null;
+        return block;
     }
 }
