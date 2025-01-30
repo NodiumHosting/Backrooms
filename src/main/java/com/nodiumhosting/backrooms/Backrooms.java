@@ -13,6 +13,8 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -60,6 +62,10 @@ public class Backrooms {
 
         MojangAuth.init();
         minecraftServer.start("0.0.0.0", 25565);
+
+        InstanceContainer icl0 = Levels.LEVEL0.getLevel().instanceContainer;
+        Entity entity = new Entity(EntityType.ENDERMAN);
+        entity.setInstance(icl0, Pos.ZERO);
     }
 
     private static void registerEvents() {

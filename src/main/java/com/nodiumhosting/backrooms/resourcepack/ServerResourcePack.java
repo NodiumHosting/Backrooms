@@ -41,7 +41,7 @@ public class ServerResourcePack {
                 .build();
 
         Texture ceiling = Texture.texture()
-                .key(Key.key("minecraft", "block/green_concrete.png"))
+                .key(Key.key("minecraft", "block/polished_diorite.png"))
                 .data(CEILING_WRITABLE)
                 .build();
 
@@ -51,7 +51,7 @@ public class ServerResourcePack {
                 .build();
 
         Texture lamp = Texture.texture()
-                .key(Key.key("minecraft", "block/redstone_lamp_on.png"))
+                .key(Key.key("minecraft", "block/diorite.png"))
                 .data(LAMP_WRITABLE)
                 .build();
 

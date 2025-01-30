@@ -19,7 +19,7 @@ import java.util.Random;
 public class Level0Generator implements Generator {
     private static final int ROOM_MIN_SIZE = 8;
     private static final int ROOM_MAX_SIZE = 16;
-    private static final int UNIT_HEIGHT = 6;
+    private static final int ROOM_HEIGHT = 4;
     private static final DynamicRegistry.Key<Biome> biomeTypeKey = MinecraftServer.getBiomeRegistry().register("level0", Biome.builder().effects(BiomeEffects.builder().ambientSound(new BiomeEffects.AmbientSound(NamespaceID.from(Key.key("backrooms:event.ambience")))).build()).build());
     private final Random random = new Random();
 
@@ -33,24 +33,7 @@ public class Level0Generator implements Generator {
         unit.modifier().fill(Block.BEDROCK);
 
         unit.modifier().fillHeight(-1, 0, Block.YELLOW_CONCRETE);
-        unit.modifier().fillHeight(0, 6, Block.BLUE_CONCRETE);
-        unit.modifier().fillHeight(6, 7, Block.GREEN_CONCRETE);
-
-        for (int x = start.blockX(); x < end.x(); x++) {
-            for (int z = start.blockZ(); z < end.z(); z++) {
-                if (random.nextInt(100) < 50 && x < end.x() - 1 && z < end.z() - 1) {
-                    if (x % 4 == 0 && z % 4 == 0) {
-                        if (random.nextInt(100) < 50) {
-                            unit.modifier().setBlock(x, 6, z, Block.REDSTONE_LAMP.withProperty("lit", "true"));
-                            unit.modifier().setBlock(x, 6, z + 1, Block.REDSTONE_LAMP.withProperty("lit", "true"));
-                        } else {
-                            unit.modifier().setBlock(x, 6, z, Block.REDSTONE_LAMP.withProperty("lit", "true"));
-                            unit.modifier().setBlock(x + 1, 6, z, Block.REDSTONE_LAMP.withProperty("lit", "true"));
-                        }
-                    }
-                }
-            }
-        }
+        unit.modifier().fillHeight(0, ROOM_HEIGHT, Block.BLUE_CONCRETE);
 
         // Generate main path using drunkard's walk
         List<Point> mainPath = generateMainPath(start, end);
@@ -140,12 +123,35 @@ public class Level0Generator implements Generator {
     }
 
     private void carveRooms(GenerationUnit unit, List<Room> rooms) {
+        Point start = unit.absoluteStart();
+        Point end = start.add(unit.size());
+
         for (Room room : rooms) {
             for (int x = room.x; x < room.x + room.width; x++) {
-                for (int z = room.z; z < room.z + room.height; z++) {
-                    for (int y = 0; y < UNIT_HEIGHT; y++) {
-                        if (isInUnit(unit, x, y, z)) {
-                            unit.modifier().setBlock(x, y, z, Block.AIR);
+                for (int y = 0; y < ROOM_HEIGHT; y++) {
+                    for (int z = room.z; z < room.z + room.height; z++) {
+                        if (y == ROOM_HEIGHT - 1) {
+                            if (random.nextInt(100) < 50 && isInUnit(unit, x - 1, y, z - 1)) {
+                                if (x % 4 == 1 && z % 4 == 1) {
+                                    if (random.nextInt(100) < 50) {
+                                        unit.modifier().setBlock(x, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        unit.modifier().setBlock(x, y, z - 1, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        continue;
+                                    } else {
+                                        unit.modifier().setBlock(x, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        unit.modifier().setBlock(x - 1, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            if (isInUnit(unit, x, y, z)) {
+                                unit.modifier().setBlock(x, y, z, Block.POLISHED_DIORITE_SLAB.withProperty("type", "top"));
+                            }
+                        } else {
+                            if (isInUnit(unit, x, y, z)) {
+                                unit.modifier().setBlock(x, y, z, Block.AIR);
+                            }
                         }
                     }
                 }
@@ -154,12 +160,35 @@ public class Level0Generator implements Generator {
     }
 
     private void carveCorridors(GenerationUnit unit, List<Point> path) {
+        Point start = unit.absoluteStart();
+        Point end = start.add(unit.size());
+
         for (Point p : path) {
             for (int x = (int) p.x() - 1; x <= p.x() + 1; x++) {
-                for (int z = (int) p.z() - 1; z <= p.z() + 1; z++) {
-                    for (int y = 0; y < UNIT_HEIGHT; y++) {
-                        if (isInUnit(unit, x, y, z)) {
-                            unit.modifier().setBlock(x, y, z, Block.AIR);
+                for (int y = 0; y < ROOM_HEIGHT; y++) {
+                    for (int z = (int) p.z() - 1; z <= p.z() + 1; z++) {
+                        if (y == ROOM_HEIGHT - 1) {
+                            if (random.nextInt(100) < 50 && isInUnit(unit, x - 1, y, z - 1)) {
+                                if (x % 4 == 1 && z % 4 == 1) {
+                                    if (random.nextInt(100) < 50) {
+                                        unit.modifier().setBlock(x, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        unit.modifier().setBlock(x, y, z - 1, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        continue;
+                                    } else {
+                                        unit.modifier().setBlock(x, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        unit.modifier().setBlock(x - 1, y, z, Block.DIORITE_SLAB.withProperty("type", "top"));
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            if (isInUnit(unit, x, y, z)) {
+                                unit.modifier().setBlock(x, y, z, Block.POLISHED_DIORITE_SLAB.withProperty("type", "top"));
+                            }
+                        } else {
+                            if (isInUnit(unit, x, y, z)) {
+                                unit.modifier().setBlock(x, y, z, Block.AIR);
+                            }
                         }
                     }
                 }

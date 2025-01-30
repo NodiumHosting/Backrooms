@@ -6,7 +6,7 @@ import net.minestom.server.world.DimensionType;
 import org.jetbrains.annotations.NotNull;
 
 public enum LevelDimensionTypes {
-    LEVEL0("backrooms:level0", DimensionType.builder().ambientLight(0.05f).build()),
+    LEVEL0("backrooms:level0", DimensionType.builder().ambientLight(1f).build()), // 0.05f
     LEVEL1("backrooms:level1", DimensionType.builder().ambientLight(1f).build());
 
     private final DynamicRegistry.@NotNull Key<DimensionType> dimensionType;
