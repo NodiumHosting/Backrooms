@@ -36,7 +36,7 @@ public class ServerResourcePack {
         Writable EMPTY_WRITABLE = Writable.resource(classLoader, EMPTY);
 
         Texture carpet = Texture.texture()
-                .key(Key.key("minecraft", "block/yellow_concrete.png"))
+                .key(Key.key("minecraft", "block/diorite.png"))
                 .data(CARPET_WRITABLE)
                 .build();
 

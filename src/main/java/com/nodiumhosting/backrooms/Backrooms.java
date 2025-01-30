@@ -4,6 +4,7 @@ import com.nodiumhosting.backrooms.event.PlayerConfiguration;
 import com.nodiumhosting.backrooms.event.PlayerPreLogin;
 import com.nodiumhosting.backrooms.event.PlayerSpawn;
 import com.nodiumhosting.backrooms.event.ServerListPing;
+import com.nodiumhosting.backrooms.level.Level;
 import com.nodiumhosting.backrooms.level.Levels;
 import com.nodiumhosting.backrooms.level.generator.FlatGenerator;
 import com.nodiumhosting.backrooms.resourcepack.ServerResourcePack;
@@ -13,6 +14,8 @@ import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -60,6 +63,11 @@ public class Backrooms {
 
         MojangAuth.init();
         minecraftServer.start("0.0.0.0", 25565);
+
+        Level l0 = Levels.LEVEL0.getLevel();
+        InstanceContainer icl0 = l0.instanceContainer;
+        Entity entity = new Entity(EntityType.ENDERMAN);
+        entity.setInstance(icl0, l0.spawnpoint);
     }
 
     private static void registerEvents() {
@@ -130,11 +138,12 @@ public class Backrooms {
             });
 
             addSyntax((sender, context) -> {
-                final Levels level = context.get(levelArg);
+                final Levels levelEnum = context.get(levelArg);
+                final Level level = levelEnum.getLevel();
                 final Player player = (Player) sender;
-                InstanceContainer instanceContainer = level.getLevel().instanceContainer;
+                InstanceContainer instanceContainer = level.instanceContainer;
                 if (player.getInstance().equals(instanceContainer)) return;
-                player.setInstance(instanceContainer, Pos.ZERO);
+                player.setInstance(instanceContainer, level.spawnpoint);
             }, levelArg);
 
             addSyntax((sender, context) -> {
@@ -147,7 +156,7 @@ public class Backrooms {
                 if (level == null) return;
                 InstanceContainer instanceContainer = level.getLevel().instanceContainer;
                 if (player.getInstance().equals(instanceContainer)) return;
-                player.setInstance(instanceContainer, Pos.ZERO);
+                player.setInstance(instanceContainer, level.getLevel().spawnpoint);
             }, intArg);
 
             addSyntax((sender, context) -> {
