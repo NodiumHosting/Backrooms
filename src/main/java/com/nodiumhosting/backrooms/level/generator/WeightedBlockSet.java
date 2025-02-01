@@ -18,7 +18,8 @@ public class WeightedBlockSet {
         }));
     }
 
-    public WeightedBlockSet() {}
+    public WeightedBlockSet() {
+    }
 
     public static WeightedBlockSet fromBlockList(List<Block> blockList) {
         return new WeightedBlockSet(blockList.stream().map(WeightedBlock::new).toList());
@@ -41,7 +42,7 @@ public class WeightedBlockSet {
         int runningTotal = 0;
         WeightedBlock block = null;
         for (WeightedBlock iteratedWeightedBlock : weightedBlockList) {
-            if (index <= runningTotal) break;
+            if (index < runningTotal) break;
             runningTotal += iteratedWeightedBlock.weight;
             block = iteratedWeightedBlock;
         }
